@@ -1,39 +1,57 @@
-import React, { useEffect, useState } from 'react'
-
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 import './App.css'
+import Container from './Container.js'
+
+const SERVER_URL = 'http://localhost:8080/api/movies'
 
 const App = () => {
-  const [message, setMessage] = useState('서버 접속 중...')
+  const [ movies, setMovies ] = useState([])
 
-  const fetchData = async () => {
+  const getMovie = async () => {
     try {
-      //const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080/api/message'
-      const apiUrl = process.env.REACT_APP_API_URL
+      const res = await axios.get(SERVER_URL)
+      console.log(res)
 
-      const response = await fetch(apiUrl)
+      setMovies(res.data)
+    } catch (err) {
+      console.log(err)
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const data = await response.json()
-
-      setMessage(data.status);
-    } catch (error) {
-      console.error('Error fetching data: ', error)
+      setMovies([])
     }
   }
 
   useEffect(() => {
-    fetchData()
+    getMovie()
   }, [])
 
   return (
-    <div className="App">
-      <h1>Backend로부터 받은 메시지</h1>
-      <p>{message}</p>
+    <div>
+      <Header/>
+      <Movielist
+        title="인생 영화"
+        listMovie={movies}/>
     </div>
   )
 }
+
+const Header = () => {
+  return (
+      <h1>영화 추천</h1>
+  )
+}
+
+const Movielist = ({title, listMovie}) => {
+  return (
+    <div className='movielist'>
+      <div className='movielist'>{title}</div>
+      {
+        listMovie.map(movie => 
+          <Container key={movie.id} movie={movie}/>)
+      }
+    </div>
+  )
+}
+
 
 export default App
