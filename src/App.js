@@ -1,21 +1,26 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import './App.css'
 import Container from './Container.js'
-
-const SERVER_URL = 'http://localhost:8080/api/movies'
 
 const App = () => {
   const [ movies, setMovies ] = useState([])
 
   const getMovie = async () => {
     try {
-      const res = await axios.get(SERVER_URL)
-      console.log(res)
+      const apiUrl = process.env.REACT_APP_API_URL
 
-      setMovies(res.data)
-    } catch (err) {
-      console.log(err)
+      const response = await fetch(apiUrl)
+      
+      if (!response.ok) {
+        throw new Error('Network response was not OK')
+      }
+
+      const data = await response.json()
+
+      setMovies(data)
+
+    } catch (error) {
+      console.error('Error fetching data: ', error)
 
       setMovies([])
     }
